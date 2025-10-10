@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Farm - Beef Breeds</title>
+  <link rel="stylesheet" href="farm.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Beef Cattle Breeds</h1>
+    <p>Explore the world’s finest beef-producing cattle</p>
+  </header>
+
+  <main class="breeds-container">
+    <!-- مثال لكل فصيلة -->
+    <section class="breed fade-card">
+      <img src="1.jpg" alt="Beef Shorthorn" onclick="showInfo(event, 'info1')" />
+      <h2>1. Beef Shorthorn</h2>
+      <p>British dual-purpose breed known for high-quality beef and maternal excellence.</p>
+      <div id="info1" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Beef Shorthorn</h3>
+        <p>Originating in England, this breed is prized for marbling, tenderness, and adaptability.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="2.jpg" alt="Brahman" onclick="showInfo(event, 'info2')" />
+      <h2>2. Brahman</h2>
+      <p>Heat-tolerant breed ideal for tropical climates with strong resistance to parasites.</p>
+      <div id="info2" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Brahman</h3>
+        <p>Derived from Indian Zebu cattle, known for loose skin and adaptability.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="3.jpg" alt="Devon" onclick="showInfo(event, 'info3')" />
+      <h2>3. Devon</h2>
+      <p>Old British breed producing tender, flavorful beef with excellent grazing ability.</p>
+      <div id="info3" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Devon</h3>
+        <p>Originally from England, Devons are hardy and efficient with rich marbled meat.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="4.jpg" alt="Galloway" onclick="showInfo(event, 'info4')" />
+      <h2>4. Galloway</h2>
+      <p>Scottish cattle with thick coats and naturally marbled beef.</p>
+      <div id="info4" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Galloway</h3>
+        <p>Known for thriving in harsh climates and producing lean, tender meat.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="5.jpg" alt="Sussex" onclick="showInfo(event, 'info5')" />
+      <h2>5. Sussex</h2>
+      <p>English breed known for good temperament and beef efficiency.</p>
+      <div id="info5" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Sussex</h3>
+        <p>Originally from England’s Weald region, Sussex cattle are productive and docile.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="6.jpg" alt="Chianina" onclick="showInfo(event, 'info6')" />
+      <h2>6. Chianina</h2>
+      <p>Italian breed famous for size, lean meat, and impressive growth rate.</p>
+      <div id="info6" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Chianina</h3>
+        <p>One of the oldest cattle breeds, producing low-fat, high-yield beef.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="7.jpg" alt="Maine Anjou" onclick="showInfo(event, 'info7')" />
+      <h2>7. Maine Anjou</h2>
+      <p>Large French breed valued for growth and carcass quality.</p>
+      <div id="info7" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Maine Anjou</h3>
+        <p>Known for heavy muscling, excellent feed efficiency, and calm temperament.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="8.jpg" alt="Tarentaise" onclick="showInfo(event, 'info8')" />
+      <h2>8. Tarentaise</h2>
+      <p>Mountain breed with lean meat and strong maternal instincts.</p>
+      <div id="info8" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Tarentaise</h3>
+        <p>Originating in the French Alps, they excel in rugged terrain and produce fine beef.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="9.jpg" alt="Murray Grey" onclick="showInfo(event, 'info9')" />
+      <h2>9. Murray Grey</h2>
+      <p>Australian breed producing well-marbled beef with mild flavor.</p>
+      <div id="info9" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Murray Grey</h3>
+        <p>Adaptable cattle producing consistent, high-quality carcasses.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="10.jpg" alt="Santa Gertrudis" onclick="showInfo(event, 'info10')" />
+      <h2>10. Santa Gertrudis</h2>
+      <p>Texan breed mixing Brahman and Shorthorn genetics for toughness.</p>
+      <div id="info10" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Santa Gertrudis</h3>
+        <p>Strong, adaptable, and fertile, producing quality beef in hot climates.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="11.jpg" alt="Beefalo" onclick="showInfo(event, 'info11')" />
+      <h2>11. Beefalo</h2>
+      <p>Hybrid of cattle and bison producing lean meat with unique flavor.</p>
+      <div id="info11" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Beefalo</h3>
+        <p>Combines bison hardiness with domestic cattle productivity.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="12.jpg" alt="Beefmaster" onclick="showInfo(event, 'info12')" />
+      <h2>12. Beefmaster</h2>
+      <p>U.S. breed developed for fertility, growth, and heat tolerance.</p>
+      <div id="info12" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Beefmaster</h3>
+        <p>Excels in adaptability, fertility, and efficient beef production.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="13.jpg" alt="Brangus" onclick="showInfo(event, 'info13')" />
+      <h2>13. Brangus</h2>
+      <p>Brahman and Angus cross for superior beef and adaptability.</p>
+      <div id="info13" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Brangus</h3>
+        <p>Black-coated breed producing tender beef with hybrid vigor.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="14.jpg" alt="Charbray" onclick="showInfo(event, 'info14')" />
+      <h2>14. Charbray</h2>
+      <p>Charolais × Brahman hybrid combining size and heat resistance.</p>
+      <div id="info14" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Charbray</h3>
+        <p>Known for muscle, growth rate, and tropical adaptability.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="15.jpg" alt="Hereford" onclick="showInfo(event, 'info15')" />
+      <h2>15. Hereford</h2>
+      <p>Globally famous red-white cattle, calm and productive.</p>
+      <div id="info15" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Hereford</h3>
+        <p>Hardy, fertile, and efficient grazers producing tender meat.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="16.jpg" alt="Charolais" onclick="showInfo(event, 'info16')" />
+      <h2>16. Charolais</h2>
+      <p>French breed prized for muscle and growth efficiency.</p>
+      <div id="info16" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Charolais</h3>
+        <p>Produces lean, high-yield carcasses ideal for crossbreeding.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="17.jpg" alt="Limousin" onclick="showInfo(event, 'info17')" />
+      <h2>17. Limousin</h2>
+      <p>Lean beef, efficient feed conversion, and strong muscles.</p>
+      <div id="info17" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Limousin</h3>
+        <p>French origin, producing high-yield, low-fat beef efficiently.</p>
+      </div>
+    </section>
+
+    <section class="breed fade-card">
+      <img src="18.jpg" alt="Bradford" onclick="showInfo(event, 'info18')" />
+      <h2>18. Bradford</h2>
+      <p>Hereford × Brahman hybrid known for toughness and quality meat.</p>
+      <div id="info18" class="info-box">
+        <button class="close-btn" onclick="closeInfo()">X</button>
+        <h3>Bradford</h3>
+        <p>Combines heat tolerance, fertility, and tender beef production.</p>
+      </div>
+    </section>
+    <section class="breed fade-card">
+  <img src="19.jpg" alt="Black Angus" onclick="showInfo(event, 'infoBlackAngus')" />
+  <h2>19. Black Angus</h2>
+  <p>One of the most popular beef breeds, known for its high-quality, marbled meat.</p>
+  <div id="infoBlackAngus" class="info-box">
+    <button class="close-btn" onclick="closeInfo()">X</button>
+    <h3>Black Angus</h3>
+    <p>Originating from Scotland, Black Angus cattle are prized for their tender, flavorful beef and efficient feed conversion.</p>
+  </div>
+</section>
+
+  </main>
+
+
+  <script>
+  
+    // ترانزيشن عند التمرير
+    window.addEventListener("scroll", () => {
+      document.querySelectorAll(".breed").forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 10) el.classList.add("visible");
+      });
+    });
+  </script>
+</body>
+</html>
