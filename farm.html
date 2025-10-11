@@ -3,133 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Farm - Beef Breeds</title>
+  <title>The Farm - Beef Breeds (Enhanced)</title>
   <style>
-    /* ====== Reset & Base ====== */
-    * { box-sizing: border-box; }
-    html,body{ height:100%; margin:0; font-family: "Poppins", sans-serif; background:#fff7f7; color:#2a100f; }
-    a { color:inherit; text-decoration:none; }
+    /* ===== Reset & Base ===== */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:#fff7f7;color:#2a100f;-webkit-font-smoothing:antialiased;}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit}
 
-    /* ====== Header ====== */
-    header{
-      text-align:center;
-      padding:28px 16px;
-      background: linear-gradient(135deg,#8b1010,#c94a3f);
-      color:#fff;
-      box-shadow: 0 6px 18px rgba(201,74,63,0.18);
-      border-bottom: 4px solid rgba(0,0,0,0.06);
-    }
-    header h1{ margin:0; font-size:clamp(20px,3.2vw,28px); letter-spacing:0.6px; }
-    header p{ margin:6px 0 0; opacity:0.95; }
-
-    /* ====== Main layout ====== */
-    .page-wrap{ position:relative; min-height:100%; transition:filter .35s ease, backdrop-filter .35s ease; }
-    .breeds-container{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:22px;
-      padding:28px;
-      max-width:1200px;
-      margin: 18px auto 80px;
-    }
-
-    .breed{
-      width:260px;
-      background: #fff;
-      border-radius:14px;
-      overflow:hidden;
-      box-shadow:0 8px 26px rgba(163,40,40,0.08);
+    /* ===== Animated background (blur motion) ===== */
+    .bg-motion{
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(255,230,230,0.9), transparent 12%),
+        radial-gradient(700px 350px at 90% 80%, rgba(255,210,210,0.95), transparent 12%),
+        linear-gradient(120deg,#fff5f5,#ffecec);
+      filter: blur(20px) saturate(1.05);
       transform-origin:center;
-      transition:transform .25s ease, box-shadow .25s ease;
-      cursor: pointer;
-      border:1px solid rgba(139,16,16,0.06);
+      animation: bgMove 14s linear infinite;
+      mix-blend-mode: screen;
     }
-    .breed:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 14px 34px rgba(163,40,40,0.12); }
-    .breed img{ width:100%; height:170px; object-fit:cover; display:block; }
-    .breed h2{ margin:12px 12px 6px; font-size:18px; color:#5a1111; }
-    .breed p{ margin:0 12px 14px; font-size:14px; color:#3a1616; opacity:0.9; }
+    @keyframes bgMove{
+      0%{transform:translate3d(0,0,0) scale(1)}
+      25%{transform:translate3d(-6%,4%,0) scale(1.04)}
+      50%{transform:translate3d(3%,-5%,0) scale(1.02)}
+      75%{transform:translate3d(-3%,-2%,0) scale(1.03)}
+      100%{transform:translate3d(0,0,0) scale(1)}
+    }
 
-    /* Keep original info-boxes but hidden (to keep original code intact) */
+    /* ===== Header ===== */
+    header{
+      position:relative; z-index:2;
+      text-align:center; padding:22px 16px;
+      background: linear-gradient(135deg,#a4161a,#c9302b);
+      color:#fff; box-shadow:0 8px 26px rgba(164,22,26,0.12);
+    }
+    header h1{margin:0;font-size:clamp(20px,3.6vw,30px);letter-spacing:0.6px}
+    header p{margin:6px 0 0;opacity:.95;font-size:14px}
+
+    /* header controls */
+    .controls{
+      margin-top:12px; display:flex; gap:10px; justify-content:center; align-items:center;
+      flex-wrap:wrap;
+    }
+    .search-wrap{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.12); padding:6px 10px; border-radius:10px; }
+    #searchBar{ border:0; background:transparent; color:#fff; outline:none; width:220px; font-size:14px; }
+    .btn{
+      background:#fff; color:#a4161a; border:0; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+      box-shadow:0 6px 18px rgba(164,22,26,0.08);
+    }
+    .btn.ghost{ background:transparent; color:rgba(255,255,255,0.9); border:1px solid rgba(255,255,255,0.08); box-shadow:none }
+
+    /* page wrapper to blur */
+    .page-wrap{ position:relative; z-index:1; transition: filter .32s ease, transform .32s ease; }
+
+    /* ===== Breeds grid ===== */
+    .breeds-container{
+      display:flex; flex-wrap:wrap; justify-content:center; gap:26px; padding:28px; max-width:1200px; margin:20px auto 140px;
+      position:relative; z-index:1;
+    }
+    .breed{
+      width:300px; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 14px 36px rgba(164,22,26,0.06);
+      transition: transform .28s ease, box-shadow .28s ease; cursor:pointer; border:1px solid rgba(164,22,26,0.06);
+    }
+    .breed:hover{ transform:translateY(-8px) scale(1.02); box-shadow:0 20px 46px rgba(164,22,26,0.12); }
+    /* IMAGE: increased, clear */
+    .breed img{ width:100%; height:220px; object-fit:cover; display:block; transition: transform .4s ease; }
+    .breed:hover img{ transform:scale(1.06); }
+    .breed h2{ margin:14px 14px 6px; font-size:18px; color:#6b1313; }
+    .breed p{ margin:0 14px 16px; font-size:14px; color:#3a1616; opacity:.95; }
+
+    /* preserve original hidden info boxes */
     .info-box{ display:none; }
 
-    /* ====== Sidebar (right) ====== */
+    /* ===== Sidebar (right) ===== */
     .info-sidebar{
-      position:fixed;
-      top:0;
-      right:-420px; /* hidden */
-      width:420px;
-      max-width:92%;
-      height:100%;
-      background: linear-gradient(180deg,#fff5f5,#ffefef);
-      box-shadow:-18px 0 36px rgba(139,16,16,0.18);
-      border-left:6px solid #b23a33;
-      padding:26px 22px;
-      transition: right .38s cubic-bezier(.2,.9,.2,1);
-      z-index:1200;
-      overflow:auto;
-      -webkit-overflow-scrolling:touch;
+      position:fixed; top:0; right:-440px; width:440px; max-width:96%; height:100%; background: linear-gradient(180deg,#fff7f7,#fff0ef);
+      box-shadow:-26px 0 60px rgba(164,22,26,0.14); border-left:6px solid #a4161a; padding:26px; transition:right .36s cubic-bezier(.2,.9,.2,1);
+      z-index:1400; overflow:auto; -webkit-overflow-scrolling:touch;
+      backdrop-filter: blur(6px) saturate(1.02);
     }
     .info-sidebar.active{ right:0; }
-
     .sidebar-head{ display:flex; gap:12px; align-items:center; margin-bottom:8px; }
-    .sidebar-head img { width:72px; height:72px; object-fit:cover; border-radius:8px; border:2px solid rgba(178,58,51,0.12); box-shadow:0 6px 18px rgba(178,58,51,0.06); }
-    .sidebar-head h2{ margin:0; font-size:20px; color:#6b1313; }
-    .sidebar-sub{ color:#5b2a2a; opacity:0.95; margin-top:6px; font-size:14px; }
+    .sidebar-head img{ width:92px; height:92px; object-fit:cover; border-radius:10px; border:2px solid rgba(178,58,51,0.12); box-shadow:0 8px 26px rgba(178,58,51,0.06); }
+    .sidebar-head h2{ margin:0; font-size:20px; color:#6b1313 }
+    .sidebar-sub{ color:#5b2a2a; opacity:.95; margin-top:6px; font-size:14px }
 
     .sidebar-section{ margin-top:14px; padding-top:12px; border-top:1px dashed rgba(178,58,51,0.08); }
     .stat{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; }
-    .stat b{ color:#3c1414; }
-    .stat small{ color:#6b2a2a; opacity:0.9; }
+    .stat b{ color:#3c1414 }
+    .stat small{ color:#6b2a2a; opacity:.95 }
 
-    .close-btn{
-      position:absolute;
-      top:14px;
-      right:14px;
-      background:#8b1010;
-      color:white;
-      border:0;
-      width:36px;
-      height:36px;
-      border-radius:50%;
-      font-size:18px;
-      line-height:1;
-      cursor:pointer;
-      box-shadow:0 6px 18px rgba(139,16,16,0.18);
-    }
-    .close-btn:hover{ transform:scale(1.04); }
+    .sidebar-actions{ display:flex; gap:8px; margin-top:12px; }
+    .side-btn{flex:1; padding:10px; border-radius:10px; border:0; cursor:pointer; font-weight:600}
+    .side-btn.primary{ background:#a4161a; color:#fff }
+    .side-btn.alt{ background:#fff; color:#a4161a; border:1px solid rgba(164,22,26,0.06) }
 
-    /* ====== Blur & overlay when sidebar open ====== */
-    .blur { filter: blur(6px) brightness(.9); pointer-events: none; user-select: none; }
-    /* We'll keep sidebar clickable even when body has pointer-events disabled by using higher z-index */
+    .close-btn{ position:absolute; top:14px; right:14px; background:#8b1010; color:white; border:0; width:38px; height:38px; border-radius:50%; font-size:18px; cursor:pointer; box-shadow:0 8px 26px rgba(139,16,16,0.18); }
+    .close-btn:hover{ transform:scale(1.04) }
 
-    /* ====== Small screens ====== */
-    @media (max-width:700px){
-      .breed{ width:48%; }
-      .sidebar-head img{ width:64px; height:64px; }
-    }
-    @media (max-width:480px){
-      .breed{ width:100%; }
-      .sidebar-head img{ display:none; }
-      .info-sidebar{ width:100%; }
-    }
+    /* ===== Top button ===== */
+    #toTopBtn{ position:fixed; right:22px; bottom:22px; width:46px; height:46px; border-radius:50%; border:0; background:#a4161a; color:white; font-size:18px; cursor:pointer; box-shadow:0 10px 26px rgba(164,22,26,0.12); display:none; z-index:1300 }
+    #toTopBtn.show{ display:block }
 
-    /* ====== Fade-in for cards on scroll ====== */
-    .fade-card{ opacity:0; transform: translateY(18px); transition: all .6s cubic-bezier(.2,.9,.2,1); }
-    .fade-card.visible{ opacity:1; transform: translateY(0); }
+    /* ===== Dark mode ===== */
+    .dark body, .dark header{ background:linear-gradient(135deg,#330707,#6b0a0a) }
+    .dark header p, .dark header h1{ color:#fff }
+    .dark .breed{ background:#120606; color:#f7eaea; border:1px solid rgba(255,255,255,0.04); box-shadow:0 10px 30px rgba(0,0,0,0.5) }
+    .dark .breed h2{ color:#ffdede }
+    .dark .breed p{ color:#ffdede; opacity:.9 }
+    .dark .info-sidebar{ background:linear-gradient(180deg,#1a0b0b,#120406); border-left:6px solid #7a0909; color:#ffdede }
+
+    /* ===== Fade-in for cards on scroll ===== */
+    .fade-card{ opacity:0; transform: translateY(18px); transition: all .6s cubic-bezier(.2,.9,.2,1) }
+    .fade-card.visible{ opacity:1; transform: translateY(0) }
+
+    /* ===== Responsive tweaks ===== */
+    @media (max-width:900px){ .breed{ width:46% } .sidebar-head img{ width:80px;height:80px } }
+    @media (max-width:520px){ .breed{ width:100% } .breeds-container{ padding:18px } .search-wrap{ width:100%; justify-content:center } .controls{ padding:6px } }
+    body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: url("background.svg") no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* طبقة الحركة الضبابية */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 0, 0, 0.15);
+  animation: blurMotion 8s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+@keyframes blurMotion {
+  0% { backdrop-filter: blur(6px) brightness(1); }
+  50% { backdrop-filter: blur(10px) brightness(1.2); }
+  100% { backdrop-filter: blur(6px) brightness(1); }
+}
 
   </style>
 </head>
 <body>
+  <!-- animated blurred background -->
+  <div class="bg-motion" aria-hidden="true"></div>
+
   <header>
     <h1>Beef Cattle Breeds</h1>
     <p>Explore the world’s finest beef-producing cattle</p>
+
+    <div class="controls" role="region" aria-label="controls">
+      <div class="search-wrap" title="Search breeds">
+        🔎
+        <input id="searchBar" placeholder="Search breed (e.g. Angus)" aria-label="Search breeds" />
+      </div>
+
+      <button id="darkToggle" class="btn ghost" title="Toggle dark mode">🌙</button>
+      <button id="resetBtn" class="btn ghost" title="Reset filters">Reset</button>
+    </div>
   </header>
 
-  <!-- Page content wrapper (we will blur this when sidebar active) -->
   <div class="page-wrap" id="pageWrap">
-    <main class="breeds-container">
-      <!-- Keep all original sections exactly but update image onclick to openSidebar with corresponding id -->
+    <main class="breeds-container" id="breedsContainer">
+
+      <!-- ===== All original 19 sections (kept intact, same text) ===== -->
       <section class="breed fade-card">
         <img src="1.jpg" alt="Beef Shorthorn" onclick="openSidebar('info1')" />
         <h2>1. Beef Shorthorn</h2>
@@ -339,186 +384,83 @@
         </div>
       </section>
 
+      <!-- end of breeds -->
     </main>
   </div>
 
-  <!-- ===== Sidebar (single shared) ===== -->
+  <!-- Sidebar (shared) -->
   <aside id="infoSidebar" class="info-sidebar" aria-hidden="true">
     <button class="close-btn" onclick="closeSidebar()" aria-label="Close">×</button>
-    <div id="sidebarInner">
-      <!-- Filled dynamically -->
-    </div>
+    <div id="sidebarInner"></div>
+    <div style="height:28px"></div>
   </aside>
 
+  <!-- Top button -->
+  <button id="toTopBtn" title="Back to top">↑</button>
+
   <script>
-    /* ===== Breed realistic data (Ideal Age in months, Meat Yield = dressing %, Breeding Period = gestation days) =====
-       Values are realistic approximate ranges used in beef production.
-    */
+    /* ===== Data preserved exactly (info1..info19) with realistic values ===== */
     const breedData = {
-      info1: {
-        name: "Beef Shorthorn",
-        img: "1.jpg",
-        desc: "Originating in England, prized for marbling, tenderness, and adaptability.",
-        age: "24–30 months",
-        yield: "62–66%",
-        period: "283 days"
-      },
-      info2: {
-        name: "Brahman",
-        img: "2.jpg",
-        desc: "Derived from Indian Zebu cattle, known for loose skin, heat tolerance and parasite resistance.",
-        age: "30–36 months (later maturity)",
-        yield: "55–60%",
-        period: "285 days"
-      },
-      info3: {
-        name: "Devon",
-        img: "3.jpg",
-        desc: "Old British breed producing tender, flavorful beef with excellent grazing ability.",
-        age: "24–30 months",
-        yield: "58–62%",
-        period: "283 days"
-      },
-      info4: {
-        name: "Galloway",
-        img: "4.jpg",
-        desc: "Known for thriving in harsh climates and producing lean, tender meat.",
-        age: "24–30 months",
-        yield: "56–61%",
-        period: "283 days"
-      },
-      info5: {
-        name: "Sussex",
-        img: "5.jpg",
-        desc: "Originally from England’s Weald region, Sussex cattle are productive and docile.",
-        age: "24–30 months",
-        yield: "60–64%",
-        period: "283 days"
-      },
-      info6: {
-        name: "Chianina",
-        img: "6.jpg",
-        desc: "One of the oldest cattle breeds, producing low-fat, high-yield beef with exceptional size.",
-        age: "30–36 months (large framed)",
-        yield: "58–62%",
-        period: "285 days"
-      },
-      info7: {
-        name: "Maine Anjou",
-        img: "7.jpg",
-        desc: "Known for heavy muscling, excellent feed efficiency, and calm temperament.",
-        age: "24–30 months",
-        yield: "62–66%",
-        period: "283 days"
-      },
-      info8: {
-        name: "Tarentaise",
-        img: "8.jpg",
-        desc: "Originating in the French Alps, they excel in rugged terrain and produce fine beef.",
-        age: "24–30 months",
-        yield: "58–62%",
-        period: "283 days"
-      },
-      info9: {
-        name: "Murray Grey",
-        img: "9.jpg",
-        desc: "Adaptable cattle producing consistent, high-quality carcasses.",
-        age: "22–28 months",
-        yield: "62–66%",
-        period: "283 days"
-      },
-      info10: {
-        name: "Santa Gertrudis",
-        img: "10.jpg",
-        desc: "Strong, adaptable, and fertile, producing quality beef in hot climates.",
-        age: "30–36 months",
-        yield: "57–62%",
-        period: "285 days"
-      },
-      info11: {
-        name: "Beefalo",
-        img: "11.jpg",
-        desc: "Combines bison hardiness with domestic cattle productivity; flavor often leaner and distinct.",
-        age: "30–36 months",
-        yield: "55–62%",
-        period: "285 days (varies with crossbreeding)"
-      },
-      info12: {
-        name: "Beefmaster",
-        img: "12.jpg",
-        desc: "Excels in adaptability, fertility, and efficient beef production.",
-        age: "30–36 months",
-        yield: "58–63%",
-        period: "285 days"
-      },
-      info13: {
-        name: "Brangus",
-        img: "13.jpg",
-        desc: "Black-coated breed producing tender beef with hybrid vigor (Brahman × Angus).",
-        age: "24–30 months",
-        yield: "62–66%",
-        period: "283 days"
-      },
-      info14: {
-        name: "Charbray",
-        img: "14.jpg",
-        desc: "Known for muscle, growth rate, and tropical adaptability (Charolais × Brahman).",
-        age: "30–36 months",
-        yield: "60–65%",
-        period: "285 days"
-      },
-      info15: {
-        name: "Hereford",
-        img: "15.jpg",
-        desc: "Hardy, fertile, and efficient grazers producing tender meat.",
-        age: "20–24 months",
-        yield: "62–66%",
-        period: "283 days"
-      },
-      info16: {
-        name: "Charolais",
-        img: "16.jpg",
-        desc: "Produces lean, high-yield carcasses ideal for crossbreeding.",
-        age: "24–30 months",
-        yield: "64–68%",
-        period: "283 days"
-      },
-      info17: {
-        name: "Limousin",
-        img: "17.jpg",
-        desc: "French origin, producing high-yield, low-fat beef efficiently.",
-        age: "18–24 months (early finishing)",
-        yield: "66–70%",
-        period: "283 days"
-      },
-      info18: {
-        name: "Bradford",
-        img: "18.jpg",
-        desc: "Combines heat tolerance, fertility, and tender beef production (Hereford × Brahman).",
-        age: "24–30 months",
-        yield: "60–64%",
-        period: "285 days"
-      },
-      info19: {
-        name: "Black Angus",
-        img: "19.jpg",
-        desc: "Originating from Scotland, prized for premium marbling and flavorful beef.",
-        age: "22–26 months",
-        yield: "64–68%",
-        period: "283 days"
-      }
+      info1:{ name:"Beef Shorthorn", img:"1.jpg", desc:"Originating in England, prized for marbling, tenderness, and adaptability.", age:"24–30 months", yield:"62–66%", period:"283 days" },
+      info2:{ name:"Brahman", img:"2.jpg", desc:"Derived from Indian Zebu cattle, known for loose skin, heat tolerance and parasite resistance.", age:"30–36 months (later maturity)", yield:"55–60%", period:"285 days" },
+      info3:{ name:"Devon", img:"3.jpg", desc:"Old British breed producing tender, flavorful beef with excellent grazing ability.", age:"24–30 months", yield:"58–62%", period:"283 days" },
+      info4:{ name:"Galloway", img:"4.jpg", desc:"Known for thriving in harsh climates and producing lean, tender meat.", age:"24–30 months", yield:"56–61%", period:"283 days" },
+      info5:{ name:"Sussex", img:"5.jpg", desc:"Originally from England’s Weald region, Sussex cattle are productive and docile.", age:"24–30 months", yield:"60–64%", period:"283 days" },
+      info6:{ name:"Chianina", img:"6.jpg", desc:"One of the oldest cattle breeds, producing low-fat, high-yield beef with exceptional size.", age:"30–36 months (large framed)", yield:"58–62%", period:"285 days" },
+      info7:{ name:"Maine Anjou", img:"7.jpg", desc:"Known for heavy muscling, excellent feed efficiency, and calm temperament.", age:"24–30 months", yield:"62–66%", period:"283 days" },
+      info8:{ name:"Tarentaise", img:"8.jpg", desc:"Originating in the French Alps, they excel in rugged terrain and produce fine beef.", age:"24–30 months", yield:"58–62%", period:"283 days" },
+      info9:{ name:"Murray Grey", img:"9.jpg", desc:"Adaptable cattle producing consistent, high-quality carcasses.", age:"22–28 months", yield:"62–66%", period:"283 days" },
+      info10:{ name:"Santa Gertrudis", img:"10.jpg", desc:"Strong, adaptable, and fertile, producing quality beef in hot climates.", age:"30–36 months", yield:"57–62%", period:"285 days" },
+      info11:{ name:"Beefalo", img:"11.jpg", desc:"Combines bison hardiness with domestic cattle productivity; flavor often leaner and distinct.", age:"30–36 months", yield:"55–62%", period:"285 days (varies with crossbreeding)" },
+      info12:{ name:"Beefmaster", img:"12.jpg", desc:"Excels in adaptability, fertility, and efficient beef production.", age:"30–36 months", yield:"58–63%", period:"285 days" },
+      info13:{ name:"Brangus", img:"13.jpg", desc:"Black-coated breed producing tender beef with hybrid vigor (Brahman × Angus).", age:"24–30 months", yield:"62–66%", period:"283 days" },
+      info14:{ name:"Charbray", img:"14.jpg", desc:"Known for muscle, growth rate, and tropical adaptability (Charolais × Brahman).", age:"30–36 months", yield:"60–65%", period:"285 days" },
+      info15:{ name:"Hereford", img:"15.jpg", desc:"Hardy, fertile, and efficient grazers producing tender meat.", age:"20–24 months", yield:"62–66%", period:"283 days" },
+      info16:{ name:"Charolais", img:"16.jpg", desc:"Produces lean, high-yield carcasses ideal for crossbreeding.", age:"24–30 months", yield:"64–68%", period:"283 days" },
+      info17:{ name:"Limousin", img:"17.jpg", desc:"French origin, producing high-yield, low-fat beef efficiently.", age:"18–24 months (early finishing)", yield:"66–70%", period:"283 days" },
+      info18:{ name:"Bradford", img:"18.jpg", desc:"Combines heat tolerance, fertility, and tender beef production (Hereford × Brahman).", age:"24–30 months", yield:"60–64%", period:"285 days" },
+      info19:{ name:"Black Angus", img:"19.jpg", desc:"Originating from Scotland, prized for premium marbling and flavorful beef.", age:"22–26 months", yield:"64–68%", period:"283 days" }
     };
 
     const sidebar = document.getElementById('infoSidebar');
     const sidebarInner = document.getElementById('sidebarInner');
     const pageWrap = document.getElementById('pageWrap');
+    const breedsContainer = document.getElementById('breedsContainer');
+    const searchBar = document.getElementById('searchBar');
+    const toTopBtn = document.getElementById('toTopBtn');
+    const darkToggle = document.getElementById('darkToggle');
+    const resetBtn = document.getElementById('resetBtn');
 
-    // Open sidebar for given infoId (e.g., 'info1')
+    // For ordering & navigation
+    const infoIds = Object.keys(breedData); // info1..info19
+    let currentIndex = -1;
+
+    // WebAudio click/open sound (small pleasant chime)
+    function playTone(type="open"){
+      try{
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        if(type==="open"){ o.frequency.value = 680; } else { o.frequency.value = 420; }
+        g.gain.value = 0;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.08, now+0.01);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, now+0.35);
+        o.stop(now+0.36);
+      }catch(e){}
+    }
+
+    // Open sidebar by infoId (e.g., "info1")
     function openSidebar(infoId){
       const data = breedData[infoId];
       if(!data) return;
+      currentIndex = infoIds.indexOf(infoId);
 
-      // Build sidebar HTML
       sidebarInner.innerHTML = `
         <div class="sidebar-head">
           <img src="${data.img}" alt="${data.name}" onerror="this.style.display='none'"/>
@@ -529,24 +471,27 @@
         </div>
 
         <div class="sidebar-section">
-          <div class="stat"><b>Ideal Age</b><small>${data.age}</small></div>
-          <div class="stat"><b>Meat Yield (dressing %)</b><small>${data.yield}</small></div>
-          <div class="stat"><b>Breeding Period (gestation)</b><small>${data.period}</small></div>
+          <div class="stat"><b>🎯 Ideal Age</b><small>${data.age}</small></div>
+          <div class="stat"><b>🍖 Meat Yield (dressing %)</b><small>${data.yield}</small></div>
+          <div class="stat"><b>🐄 Breeding Period (gestation)</b><small>${data.period}</small></div>
         </div>
 
         <div class="sidebar-section">
           <p><small>Note: values are typical production ranges (approx.). Actual figures depend on management, feeding, and genetics.</small></p>
         </div>
+
+        <div class="sidebar-section sidebar-actions">
+          <button class="side-btn alt" onclick="gotoPrev()">← Previous</button>
+          <button class="side-btn primary" onclick="gotoNext()">Next →</button>
+        </div>
       `;
 
-      // Show sidebar and blur page content
       sidebar.classList.add('active');
       sidebar.setAttribute('aria-hidden','false');
       pageWrap.classList.add('blur');
-
-      // prevent page scrolling behind sidebar on mobile
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
+      playTone("open");
     }
 
     function closeSidebar(){
@@ -555,12 +500,64 @@
       pageWrap.classList.remove('blur');
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
+      playTone("close");
     }
 
-    // keep original info-box close (if any) — no-op but preserved to not break original markup expectations
-    function closeOldInfo(){ /* intentionally kept to mirror original code; sidebar used instead */ }
+    function gotoNext(){
+      if(currentIndex < infoIds.length-1) currentIndex++;
+      else currentIndex = 0;
+      openSidebar(infoIds[currentIndex]);
+    }
+    function gotoPrev(){
+      if(currentIndex > 0) currentIndex--;
+      else currentIndex = infoIds.length-1;
+      openSidebar(infoIds[currentIndex]);
+    }
 
-    // Fade-in on scroll
+    // Keep placeholder function from original markup
+    function closeOldInfo(){ /* preserved for compatibility */ }
+
+    /* ===== Search / Filter ===== */
+    function filterBreeds(){
+      const q = (searchBar.value || "").trim().toLowerCase();
+      document.querySelectorAll('.breed').forEach(b=>{
+        const name = (b.querySelector('h2')?.textContent||"").toLowerCase();
+        const desc = (b.querySelector('p')?.textContent||"").toLowerCase();
+        const show = !q || name.includes(q) || desc.includes(q);
+        b.style.display = show ? '' : 'none';
+      });
+    }
+    searchBar.addEventListener('input', filterBreeds);
+
+    resetBtn.addEventListener('click', ()=>{
+      searchBar.value = "";
+      filterBreeds();
+      // close sidebar if open
+      closeSidebar();
+    });
+
+    /* ===== Top button behavior ===== */
+    window.addEventListener('scroll', ()=>{
+      toTopBtn.classList.toggle('show', window.scrollY > 420);
+    });
+    toTopBtn.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}) );
+
+    /* ===== Dark mode toggle ===== */
+    function setDarkMode(on){
+      if(on) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      localStorage.setItem('farm-dark', on ? '1' : '0');
+    }
+    darkToggle.addEventListener('click', ()=>{
+      const on = !document.documentElement.classList.contains('dark');
+      setDarkMode(on);
+      darkToggle.textContent = on ? '☀️' : '🌙';
+    });
+    // init from storage
+    if(localStorage.getItem('farm-dark') === '1'){ setDarkMode(true); darkToggle.textContent='☀️' }
+    else { setDarkMode(false); darkToggle.textContent='🌙' }
+
+    /* ===== Fade-in on scroll ===== */
     function handleScrollFade(){
       document.querySelectorAll('.fade-card').forEach(el=>{
         const rect = el.getBoundingClientRect();
@@ -570,26 +567,51 @@
     window.addEventListener('scroll', handleScrollFade);
     window.addEventListener('load', handleScrollFade);
 
-    // Close sidebar when pressing Escape
+    // Keyboard navigation: Esc to close, left/right for prev/next when sidebar open
     window.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape' && sidebar.classList.contains('active')){
-        closeSidebar();
+      if(e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
+      if(sidebar.classList.contains('active')){
+        if(e.key === 'ArrowRight') gotoNext();
+        if(e.key === 'ArrowLeft') gotoPrev();
       }
     });
 
-    // If user clicks outside sidebar (on overlay area), close it.
-    // Because we used blur on pageWrap (which disables pointer-events), we need an explicit overlay detection.
-    // Instead, add click listener on document and check if click target is outside sidebar when active.
+    /* Close sidebar when clicking outside */
     document.addEventListener('click', function(e){
       if(!sidebar.classList.contains('active')) return;
       const insideSidebar = sidebar.contains(e.target);
-      const clickedImageOrBreed = e.target.closest('.breed');
-      // If clicked inside sidebar -> do nothing. If clicked on a different breed -> open that breed (so allow).
-      if(!insideSidebar && !clickedImageOrBreed){
-        // clicked on blank area (not breed list) -> close
+      const clickedBreed = e.target.closest('.breed');
+      if(!insideSidebar && !clickedBreed){
         closeSidebar();
       }
-      // If clicked on a different breed, the breed's onclick will fire and openSidebar will be called afterwards.
+    }, true);
+
+    /* Accessibility: make breeds focusable & openable by Enter/Space */
+    document.querySelectorAll('.breed').forEach((b, idx)=>{
+      b.setAttribute('tabindex','0');
+      // derive info id by original order: info1..info19
+      const infoId = 'info' + (idx+1);
+      b.addEventListener('keydown', (ev)=>{
+        if(ev.key === 'Enter' || ev.key === ' ') { openSidebar(infoId); ev.preventDefault(); }
+      });
+      // also ensure clicking image or any part opens
+      b.addEventListener('click', ()=> openSidebar(infoId));
+    });
+
+    /* Provide quick focus to search on '/' key */
+    window.addEventListener('keydown',(e)=>{
+      if(e.key === '/' && document.activeElement !== searchBar){
+        e.preventDefault();
+        searchBar.focus();
+      }
+    });
+
+    /* Make sure images that are missing don't break layout (optional) */
+    window.addEventListener('error', (ev)=>{
+      if(ev.target && ev.target.tagName === 'IMG'){
+        ev.target.style.opacity = '0.6';
+        ev.target.style.filter = 'grayscale(30%)';
+      }
     }, true);
 
   </script>
