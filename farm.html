@@ -4,237 +4,594 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Farm - Beef Breeds</title>
-  <link rel="stylesheet" href="farm.css" />
-</head>
+  <style>
+    /* ====== Reset & Base ====== */
+    * { box-sizing: border-box; }
+    html,body{ height:100%; margin:0; font-family: "Poppins", sans-serif; background:#fff7f7; color:#2a100f; }
+    a { color:inherit; text-decoration:none; }
 
+    /* ====== Header ====== */
+    header{
+      text-align:center;
+      padding:28px 16px;
+      background: linear-gradient(135deg,#8b1010,#c94a3f);
+      color:#fff;
+      box-shadow: 0 6px 18px rgba(201,74,63,0.18);
+      border-bottom: 4px solid rgba(0,0,0,0.06);
+    }
+    header h1{ margin:0; font-size:clamp(20px,3.2vw,28px); letter-spacing:0.6px; }
+    header p{ margin:6px 0 0; opacity:0.95; }
+
+    /* ====== Main layout ====== */
+    .page-wrap{ position:relative; min-height:100%; transition:filter .35s ease, backdrop-filter .35s ease; }
+    .breeds-container{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:22px;
+      padding:28px;
+      max-width:1200px;
+      margin: 18px auto 80px;
+    }
+
+    .breed{
+      width:260px;
+      background: #fff;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 8px 26px rgba(163,40,40,0.08);
+      transform-origin:center;
+      transition:transform .25s ease, box-shadow .25s ease;
+      cursor: pointer;
+      border:1px solid rgba(139,16,16,0.06);
+    }
+    .breed:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 14px 34px rgba(163,40,40,0.12); }
+    .breed img{ width:100%; height:170px; object-fit:cover; display:block; }
+    .breed h2{ margin:12px 12px 6px; font-size:18px; color:#5a1111; }
+    .breed p{ margin:0 12px 14px; font-size:14px; color:#3a1616; opacity:0.9; }
+
+    /* Keep original info-boxes but hidden (to keep original code intact) */
+    .info-box{ display:none; }
+
+    /* ====== Sidebar (right) ====== */
+    .info-sidebar{
+      position:fixed;
+      top:0;
+      right:-420px; /* hidden */
+      width:420px;
+      max-width:92%;
+      height:100%;
+      background: linear-gradient(180deg,#fff5f5,#ffefef);
+      box-shadow:-18px 0 36px rgba(139,16,16,0.18);
+      border-left:6px solid #b23a33;
+      padding:26px 22px;
+      transition: right .38s cubic-bezier(.2,.9,.2,1);
+      z-index:1200;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .info-sidebar.active{ right:0; }
+
+    .sidebar-head{ display:flex; gap:12px; align-items:center; margin-bottom:8px; }
+    .sidebar-head img { width:72px; height:72px; object-fit:cover; border-radius:8px; border:2px solid rgba(178,58,51,0.12); box-shadow:0 6px 18px rgba(178,58,51,0.06); }
+    .sidebar-head h2{ margin:0; font-size:20px; color:#6b1313; }
+    .sidebar-sub{ color:#5b2a2a; opacity:0.95; margin-top:6px; font-size:14px; }
+
+    .sidebar-section{ margin-top:14px; padding-top:12px; border-top:1px dashed rgba(178,58,51,0.08); }
+    .stat{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; }
+    .stat b{ color:#3c1414; }
+    .stat small{ color:#6b2a2a; opacity:0.9; }
+
+    .close-btn{
+      position:absolute;
+      top:14px;
+      right:14px;
+      background:#8b1010;
+      color:white;
+      border:0;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      font-size:18px;
+      line-height:1;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(139,16,16,0.18);
+    }
+    .close-btn:hover{ transform:scale(1.04); }
+
+    /* ====== Blur & overlay when sidebar open ====== */
+    .blur { filter: blur(6px) brightness(.9); pointer-events: none; user-select: none; }
+    /* We'll keep sidebar clickable even when body has pointer-events disabled by using higher z-index */
+
+    /* ====== Small screens ====== */
+    @media (max-width:700px){
+      .breed{ width:48%; }
+      .sidebar-head img{ width:64px; height:64px; }
+    }
+    @media (max-width:480px){
+      .breed{ width:100%; }
+      .sidebar-head img{ display:none; }
+      .info-sidebar{ width:100%; }
+    }
+
+    /* ====== Fade-in for cards on scroll ====== */
+    .fade-card{ opacity:0; transform: translateY(18px); transition: all .6s cubic-bezier(.2,.9,.2,1); }
+    .fade-card.visible{ opacity:1; transform: translateY(0); }
+
+  </style>
+</head>
 <body>
   <header>
     <h1>Beef Cattle Breeds</h1>
     <p>Explore the world’s finest beef-producing cattle</p>
   </header>
 
-  <main class="breeds-container">
-    <!-- مثال لكل فصيلة -->
-    <section class="breed fade-card">
-      <img src="1.jpg" alt="Beef Shorthorn" onclick="showInfo(event, 'info1')" />
-      <h2>1. Beef Shorthorn</h2>
-      <p>British dual-purpose breed known for high-quality beef and maternal excellence.</p>
-      <div id="info1" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Beef Shorthorn</h3>
-        <p>Originating in England, this breed is prized for marbling, tenderness, and adaptability.</p>
-      </div>
-    </section>
+  <!-- Page content wrapper (we will blur this when sidebar active) -->
+  <div class="page-wrap" id="pageWrap">
+    <main class="breeds-container">
+      <!-- Keep all original sections exactly but update image onclick to openSidebar with corresponding id -->
+      <section class="breed fade-card">
+        <img src="1.jpg" alt="Beef Shorthorn" onclick="openSidebar('info1')" />
+        <h2>1. Beef Shorthorn</h2>
+        <p>British dual-purpose breed known for high-quality beef and maternal excellence.</p>
+        <div id="info1" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Beef Shorthorn</h3>
+          <p>Originating in England, this breed is prized for marbling, tenderness, and adaptability.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="2.jpg" alt="Brahman" onclick="showInfo(event, 'info2')" />
-      <h2>2. Brahman</h2>
-      <p>Heat-tolerant breed ideal for tropical climates with strong resistance to parasites.</p>
-      <div id="info2" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Brahman</h3>
-        <p>Derived from Indian Zebu cattle, known for loose skin and adaptability.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="2.jpg" alt="Brahman" onclick="openSidebar('info2')" />
+        <h2>2. Brahman</h2>
+        <p>Heat-tolerant breed ideal for tropical climates with strong resistance to parasites.</p>
+        <div id="info2" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Brahman</h3>
+          <p>Derived from Indian Zebu cattle, known for loose skin and adaptability.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="3.jpg" alt="Devon" onclick="showInfo(event, 'info3')" />
-      <h2>3. Devon</h2>
-      <p>Old British breed producing tender, flavorful beef with excellent grazing ability.</p>
-      <div id="info3" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Devon</h3>
-        <p>Originally from England, Devons are hardy and efficient with rich marbled meat.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="3.jpg" alt="Devon" onclick="openSidebar('info3')" />
+        <h2>3. Devon</h2>
+        <p>Old British breed producing tender, flavorful beef with excellent grazing ability.</p>
+        <div id="info3" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Devon</h3>
+          <p>Originally from England, Devons are hardy and efficient with rich marbled meat.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="4.jpg" alt="Galloway" onclick="showInfo(event, 'info4')" />
-      <h2>4. Galloway</h2>
-      <p>Scottish cattle with thick coats and naturally marbled beef.</p>
-      <div id="info4" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Galloway</h3>
-        <p>Known for thriving in harsh climates and producing lean, tender meat.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="4.jpg" alt="Galloway" onclick="openSidebar('info4')" />
+        <h2>4. Galloway</h2>
+        <p>Scottish cattle with thick coats and naturally marbled beef.</p>
+        <div id="info4" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Galloway</h3>
+          <p>Known for thriving in harsh climates and producing lean, tender meat.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="5.jpg" alt="Sussex" onclick="showInfo(event, 'info5')" />
-      <h2>5. Sussex</h2>
-      <p>English breed known for good temperament and beef efficiency.</p>
-      <div id="info5" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Sussex</h3>
-        <p>Originally from England’s Weald region, Sussex cattle are productive and docile.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="5.jpg" alt="Sussex" onclick="openSidebar('info5')" />
+        <h2>5. Sussex</h2>
+        <p>English breed known for good temperament and beef efficiency.</p>
+        <div id="info5" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Sussex</h3>
+          <p>Originally from England’s Weald region, Sussex cattle are productive and docile.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="6.jpg" alt="Chianina" onclick="showInfo(event, 'info6')" />
-      <h2>6. Chianina</h2>
-      <p>Italian breed famous for size, lean meat, and impressive growth rate.</p>
-      <div id="info6" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Chianina</h3>
-        <p>One of the oldest cattle breeds, producing low-fat, high-yield beef.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="6.jpg" alt="Chianina" onclick="openSidebar('info6')" />
+        <h2>6. Chianina</h2>
+        <p>Italian breed famous for size, lean meat, and impressive growth rate.</p>
+        <div id="info6" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Chianina</h3>
+          <p>One of the oldest cattle breeds, producing low-fat, high-yield beef.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="7.jpg" alt="Maine Anjou" onclick="showInfo(event, 'info7')" />
-      <h2>7. Maine Anjou</h2>
-      <p>Large French breed valued for growth and carcass quality.</p>
-      <div id="info7" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Maine Anjou</h3>
-        <p>Known for heavy muscling, excellent feed efficiency, and calm temperament.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="7.jpg" alt="Maine Anjou" onclick="openSidebar('info7')" />
+        <h2>7. Maine Anjou</h2>
+        <p>Large French breed valued for growth and carcass quality.</p>
+        <div id="info7" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Maine Anjou</h3>
+          <p>Known for heavy muscling, excellent feed efficiency, and calm temperament.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="8.jpg" alt="Tarentaise" onclick="showInfo(event, 'info8')" />
-      <h2>8. Tarentaise</h2>
-      <p>Mountain breed with lean meat and strong maternal instincts.</p>
-      <div id="info8" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Tarentaise</h3>
-        <p>Originating in the French Alps, they excel in rugged terrain and produce fine beef.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="8.jpg" alt="Tarentaise" onclick="openSidebar('info8')" />
+        <h2>8. Tarentaise</h2>
+        <p>Mountain breed with lean meat and strong maternal instincts.</p>
+        <div id="info8" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Tarentaise</h3>
+          <p>Originating in the French Alps, they excel in rugged terrain and produce fine beef.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="9.jpg" alt="Murray Grey" onclick="showInfo(event, 'info9')" />
-      <h2>9. Murray Grey</h2>
-      <p>Australian breed producing well-marbled beef with mild flavor.</p>
-      <div id="info9" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Murray Grey</h3>
-        <p>Adaptable cattle producing consistent, high-quality carcasses.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="9.jpg" alt="Murray Grey" onclick="openSidebar('info9')" />
+        <h2>9. Murray Grey</h2>
+        <p>Australian breed producing well-marbled beef with mild flavor.</p>
+        <div id="info9" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Murray Grey</h3>
+          <p>Adaptable cattle producing consistent, high-quality carcasses.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="10.jpg" alt="Santa Gertrudis" onclick="showInfo(event, 'info10')" />
-      <h2>10. Santa Gertrudis</h2>
-      <p>Texan breed mixing Brahman and Shorthorn genetics for toughness.</p>
-      <div id="info10" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Santa Gertrudis</h3>
-        <p>Strong, adaptable, and fertile, producing quality beef in hot climates.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="10.jpg" alt="Santa Gertrudis" onclick="openSidebar('info10')" />
+        <h2>10. Santa Gertrudis</h2>
+        <p>Texan breed mixing Brahman and Shorthorn genetics for toughness.</p>
+        <div id="info10" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Santa Gertrudis</h3>
+          <p>Strong, adaptable, and fertile, producing quality beef in hot climates.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="11.jpg" alt="Beefalo" onclick="showInfo(event, 'info11')" />
-      <h2>11. Beefalo</h2>
-      <p>Hybrid of cattle and bison producing lean meat with unique flavor.</p>
-      <div id="info11" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Beefalo</h3>
-        <p>Combines bison hardiness with domestic cattle productivity.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="11.jpg" alt="Beefalo" onclick="openSidebar('info11')" />
+        <h2>11. Beefalo</h2>
+        <p>Hybrid of cattle and bison producing lean meat with unique flavor.</p>
+        <div id="info11" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Beefalo</h3>
+          <p>Combines bison hardiness with domestic cattle productivity.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="12.jpg" alt="Beefmaster" onclick="showInfo(event, 'info12')" />
-      <h2>12. Beefmaster</h2>
-      <p>U.S. breed developed for fertility, growth, and heat tolerance.</p>
-      <div id="info12" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Beefmaster</h3>
-        <p>Excels in adaptability, fertility, and efficient beef production.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="12.jpg" alt="Beefmaster" onclick="openSidebar('info12')" />
+        <h2>12. Beefmaster</h2>
+        <p>U.S. breed developed for fertility, growth, and heat tolerance.</p>
+        <div id="info12" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Beefmaster</h3>
+          <p>Excels in adaptability, fertility, and efficient beef production.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="13.jpg" alt="Brangus" onclick="showInfo(event, 'info13')" />
-      <h2>13. Brangus</h2>
-      <p>Brahman and Angus cross for superior beef and adaptability.</p>
-      <div id="info13" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Brangus</h3>
-        <p>Black-coated breed producing tender beef with hybrid vigor.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="13.jpg" alt="Brangus" onclick="openSidebar('info13')" />
+        <h2>13. Brangus</h2>
+        <p>Brahman and Angus cross for superior beef and adaptability.</p>
+        <div id="info13" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Brangus</h3>
+          <p>Black-coated breed producing tender beef with hybrid vigor.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="14.jpg" alt="Charbray" onclick="showInfo(event, 'info14')" />
-      <h2>14. Charbray</h2>
-      <p>Charolais × Brahman hybrid combining size and heat resistance.</p>
-      <div id="info14" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Charbray</h3>
-        <p>Known for muscle, growth rate, and tropical adaptability.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="14.jpg" alt="Charbray" onclick="openSidebar('info14')" />
+        <h2>14. Charbray</h2>
+        <p>Charolais × Brahman hybrid combining size and heat resistance.</p>
+        <div id="info14" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Charbray</h3>
+          <p>Known for muscle, growth rate, and tropical adaptability.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="15.jpg" alt="Hereford" onclick="showInfo(event, 'info15')" />
-      <h2>15. Hereford</h2>
-      <p>Globally famous red-white cattle, calm and productive.</p>
-      <div id="info15" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Hereford</h3>
-        <p>Hardy, fertile, and efficient grazers producing tender meat.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="15.jpg" alt="Hereford" onclick="openSidebar('info15')" />
+        <h2>15. Hereford</h2>
+        <p>Globally famous red-white cattle, calm and productive.</p>
+        <div id="info15" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Hereford</h3>
+          <p>Hardy, fertile, and efficient grazers producing tender meat.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="16.jpg" alt="Charolais" onclick="showInfo(event, 'info16')" />
-      <h2>16. Charolais</h2>
-      <p>French breed prized for muscle and growth efficiency.</p>
-      <div id="info16" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Charolais</h3>
-        <p>Produces lean, high-yield carcasses ideal for crossbreeding.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="16.jpg" alt="Charolais" onclick="openSidebar('info16')" />
+        <h2>16. Charolais</h2>
+        <p>French breed prized for muscle and growth efficiency.</p>
+        <div id="info16" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Charolais</h3>
+          <p>Produces lean, high-yield carcasses ideal for crossbreeding.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="17.jpg" alt="Limousin" onclick="showInfo(event, 'info17')" />
-      <h2>17. Limousin</h2>
-      <p>Lean beef, efficient feed conversion, and strong muscles.</p>
-      <div id="info17" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Limousin</h3>
-        <p>French origin, producing high-yield, low-fat beef efficiently.</p>
-      </div>
-    </section>
+      <section class="breed fade-card">
+        <img src="17.jpg" alt="Limousin" onclick="openSidebar('info17')" />
+        <h2>17. Limousin</h2>
+        <p>Lean beef, efficient feed conversion, and strong muscles.</p>
+        <div id="info17" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Limousin</h3>
+          <p>French origin, producing high-yield, low-fat beef efficiently.</p>
+        </div>
+      </section>
 
-    <section class="breed fade-card">
-      <img src="18.jpg" alt="Bradford" onclick="showInfo(event, 'info18')" />
-      <h2>18. Bradford</h2>
-      <p>Hereford × Brahman hybrid known for toughness and quality meat.</p>
-      <div id="info18" class="info-box">
-        <button class="close-btn" onclick="closeInfo()">X</button>
-        <h3>Bradford</h3>
-        <p>Combines heat tolerance, fertility, and tender beef production.</p>
-      </div>
-    </section>
-    <section class="breed fade-card">
-  <img src="19.jpg" alt="Black Angus" onclick="showInfo(event, 'infoBlackAngus')" />
-  <h2>19. Black Angus</h2>
-  <p>One of the most popular beef breeds, known for its high-quality, marbled meat.</p>
-  <div id="infoBlackAngus" class="info-box">
-    <button class="close-btn" onclick="closeInfo()">X</button>
-    <h3>Black Angus</h3>
-    <p>Originating from Scotland, Black Angus cattle are prized for their tender, flavorful beef and efficient feed conversion.</p>
+      <section class="breed fade-card">
+        <img src="18.jpg" alt="Bradford" onclick="openSidebar('info18')" />
+        <h2>18. Bradford</h2>
+        <p>Hereford × Brahman hybrid known for toughness and quality meat.</p>
+        <div id="info18" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Bradford</h3>
+          <p>Combines heat tolerance, fertility, and tender beef production.</p>
+        </div>
+      </section>
+
+      <section class="breed fade-card">
+        <img src="19.jpg" alt="Black Angus" onclick="openSidebar('info19')" />
+        <h2>19. Black Angus</h2>
+        <p>One of the most popular beef breeds, known for its high-quality, marbled meat.</p>
+        <div id="info19" class="info-box">
+          <button class="close-btn" onclick="closeOldInfo()">X</button>
+          <h3>Black Angus</h3>
+          <p>Originating from Scotland, Black Angus cattle are prized for their tender, flavorful beef and efficient feed conversion.</p>
+        </div>
+      </section>
+
+    </main>
   </div>
-</section>
 
-  </main>
-
+  <!-- ===== Sidebar (single shared) ===== -->
+  <aside id="infoSidebar" class="info-sidebar" aria-hidden="true">
+    <button class="close-btn" onclick="closeSidebar()" aria-label="Close">×</button>
+    <div id="sidebarInner">
+      <!-- Filled dynamically -->
+    </div>
+  </aside>
 
   <script>
-  
-    // ترانزيشن عند التمرير
-    window.addEventListener("scroll", () => {
-      document.querySelectorAll(".breed").forEach(el => {
+    /* ===== Breed realistic data (Ideal Age in months, Meat Yield = dressing %, Breeding Period = gestation days) =====
+       Values are realistic approximate ranges used in beef production.
+    */
+    const breedData = {
+      info1: {
+        name: "Beef Shorthorn",
+        img: "1.jpg",
+        desc: "Originating in England, prized for marbling, tenderness, and adaptability.",
+        age: "24–30 months",
+        yield: "62–66%",
+        period: "283 days"
+      },
+      info2: {
+        name: "Brahman",
+        img: "2.jpg",
+        desc: "Derived from Indian Zebu cattle, known for loose skin, heat tolerance and parasite resistance.",
+        age: "30–36 months (later maturity)",
+        yield: "55–60%",
+        period: "285 days"
+      },
+      info3: {
+        name: "Devon",
+        img: "3.jpg",
+        desc: "Old British breed producing tender, flavorful beef with excellent grazing ability.",
+        age: "24–30 months",
+        yield: "58–62%",
+        period: "283 days"
+      },
+      info4: {
+        name: "Galloway",
+        img: "4.jpg",
+        desc: "Known for thriving in harsh climates and producing lean, tender meat.",
+        age: "24–30 months",
+        yield: "56–61%",
+        period: "283 days"
+      },
+      info5: {
+        name: "Sussex",
+        img: "5.jpg",
+        desc: "Originally from England’s Weald region, Sussex cattle are productive and docile.",
+        age: "24–30 months",
+        yield: "60–64%",
+        period: "283 days"
+      },
+      info6: {
+        name: "Chianina",
+        img: "6.jpg",
+        desc: "One of the oldest cattle breeds, producing low-fat, high-yield beef with exceptional size.",
+        age: "30–36 months (large framed)",
+        yield: "58–62%",
+        period: "285 days"
+      },
+      info7: {
+        name: "Maine Anjou",
+        img: "7.jpg",
+        desc: "Known for heavy muscling, excellent feed efficiency, and calm temperament.",
+        age: "24–30 months",
+        yield: "62–66%",
+        period: "283 days"
+      },
+      info8: {
+        name: "Tarentaise",
+        img: "8.jpg",
+        desc: "Originating in the French Alps, they excel in rugged terrain and produce fine beef.",
+        age: "24–30 months",
+        yield: "58–62%",
+        period: "283 days"
+      },
+      info9: {
+        name: "Murray Grey",
+        img: "9.jpg",
+        desc: "Adaptable cattle producing consistent, high-quality carcasses.",
+        age: "22–28 months",
+        yield: "62–66%",
+        period: "283 days"
+      },
+      info10: {
+        name: "Santa Gertrudis",
+        img: "10.jpg",
+        desc: "Strong, adaptable, and fertile, producing quality beef in hot climates.",
+        age: "30–36 months",
+        yield: "57–62%",
+        period: "285 days"
+      },
+      info11: {
+        name: "Beefalo",
+        img: "11.jpg",
+        desc: "Combines bison hardiness with domestic cattle productivity; flavor often leaner and distinct.",
+        age: "30–36 months",
+        yield: "55–62%",
+        period: "285 days (varies with crossbreeding)"
+      },
+      info12: {
+        name: "Beefmaster",
+        img: "12.jpg",
+        desc: "Excels in adaptability, fertility, and efficient beef production.",
+        age: "30–36 months",
+        yield: "58–63%",
+        period: "285 days"
+      },
+      info13: {
+        name: "Brangus",
+        img: "13.jpg",
+        desc: "Black-coated breed producing tender beef with hybrid vigor (Brahman × Angus).",
+        age: "24–30 months",
+        yield: "62–66%",
+        period: "283 days"
+      },
+      info14: {
+        name: "Charbray",
+        img: "14.jpg",
+        desc: "Known for muscle, growth rate, and tropical adaptability (Charolais × Brahman).",
+        age: "30–36 months",
+        yield: "60–65%",
+        period: "285 days"
+      },
+      info15: {
+        name: "Hereford",
+        img: "15.jpg",
+        desc: "Hardy, fertile, and efficient grazers producing tender meat.",
+        age: "20–24 months",
+        yield: "62–66%",
+        period: "283 days"
+      },
+      info16: {
+        name: "Charolais",
+        img: "16.jpg",
+        desc: "Produces lean, high-yield carcasses ideal for crossbreeding.",
+        age: "24–30 months",
+        yield: "64–68%",
+        period: "283 days"
+      },
+      info17: {
+        name: "Limousin",
+        img: "17.jpg",
+        desc: "French origin, producing high-yield, low-fat beef efficiently.",
+        age: "18–24 months (early finishing)",
+        yield: "66–70%",
+        period: "283 days"
+      },
+      info18: {
+        name: "Bradford",
+        img: "18.jpg",
+        desc: "Combines heat tolerance, fertility, and tender beef production (Hereford × Brahman).",
+        age: "24–30 months",
+        yield: "60–64%",
+        period: "285 days"
+      },
+      info19: {
+        name: "Black Angus",
+        img: "19.jpg",
+        desc: "Originating from Scotland, prized for premium marbling and flavorful beef.",
+        age: "22–26 months",
+        yield: "64–68%",
+        period: "283 days"
+      }
+    };
+
+    const sidebar = document.getElementById('infoSidebar');
+    const sidebarInner = document.getElementById('sidebarInner');
+    const pageWrap = document.getElementById('pageWrap');
+
+    // Open sidebar for given infoId (e.g., 'info1')
+    function openSidebar(infoId){
+      const data = breedData[infoId];
+      if(!data) return;
+
+      // Build sidebar HTML
+      sidebarInner.innerHTML = `
+        <div class="sidebar-head">
+          <img src="${data.img}" alt="${data.name}" onerror="this.style.display='none'"/>
+          <div>
+            <h2>${data.name}</h2>
+            <div class="sidebar-sub">${data.desc}</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="stat"><b>Ideal Age</b><small>${data.age}</small></div>
+          <div class="stat"><b>Meat Yield (dressing %)</b><small>${data.yield}</small></div>
+          <div class="stat"><b>Breeding Period (gestation)</b><small>${data.period}</small></div>
+        </div>
+
+        <div class="sidebar-section">
+          <p><small>Note: values are typical production ranges (approx.). Actual figures depend on management, feeding, and genetics.</small></p>
+        </div>
+      `;
+
+      // Show sidebar and blur page content
+      sidebar.classList.add('active');
+      sidebar.setAttribute('aria-hidden','false');
+      pageWrap.classList.add('blur');
+
+      // prevent page scrolling behind sidebar on mobile
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar(){
+      sidebar.classList.remove('active');
+      sidebar.setAttribute('aria-hidden','true');
+      pageWrap.classList.remove('blur');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+
+    // keep original info-box close (if any) — no-op but preserved to not break original markup expectations
+    function closeOldInfo(){ /* intentionally kept to mirror original code; sidebar used instead */ }
+
+    // Fade-in on scroll
+    function handleScrollFade(){
+      document.querySelectorAll('.fade-card').forEach(el=>{
         const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight - 10) el.classList.add("visible");
+        if(rect.top < window.innerHeight - 60) el.classList.add('visible');
       });
+    }
+    window.addEventListener('scroll', handleScrollFade);
+    window.addEventListener('load', handleScrollFade);
+
+    // Close sidebar when pressing Escape
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && sidebar.classList.contains('active')){
+        closeSidebar();
+      }
     });
+
+    // If user clicks outside sidebar (on overlay area), close it.
+    // Because we used blur on pageWrap (which disables pointer-events), we need an explicit overlay detection.
+    // Instead, add click listener on document and check if click target is outside sidebar when active.
+    document.addEventListener('click', function(e){
+      if(!sidebar.classList.contains('active')) return;
+      const insideSidebar = sidebar.contains(e.target);
+      const clickedImageOrBreed = e.target.closest('.breed');
+      // If clicked inside sidebar -> do nothing. If clicked on a different breed -> open that breed (so allow).
+      if(!insideSidebar && !clickedImageOrBreed){
+        // clicked on blank area (not breed list) -> close
+        closeSidebar();
+      }
+      // If clicked on a different breed, the breed's onclick will fire and openSidebar will be called afterwards.
+    }, true);
+
   </script>
 </body>
 </html>
